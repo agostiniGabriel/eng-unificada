@@ -1,0 +1,12 @@
+{
+    "400":{
+        "sucess":false,
+        "statusCode":400,
+        "errorMessage": "Bad request - Body Inválido"
+    },
+    "201":{
+        "sucess":true,
+        "statusCode": 201,
+        "detailedMessage": "Dados inseridos com sucesso."
+    }
+}
