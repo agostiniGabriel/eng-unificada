@@ -1,3 +1,5 @@
+const { json } = require('express/lib/response');
+
 module.exports = app =>{
     const controller = {};
     const updateReadingsResponses = app.data.updateReadings;
@@ -13,8 +15,7 @@ module.exports = app =>{
 
     controller.updateReadings = (req,res) => {
         const { body } = req;
-
-        utils.validateBody(body,requiredBodyTemplate) ? res.status(400).json(updateReadingsResponses["201"]) : res.status(400).json(updateReadingsResponses["400"]);
+        utils.validateBody(body,requiredBodyTemplate) ? res.status(200).json(updateReadingsResponses["201"]) : res.status(400).json(updateReadingsResponses["400"]);
     }
 
     return controller;
