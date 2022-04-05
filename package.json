@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/agostiniGabriel/eng-unificada-automacao#readme",
   "dependencies": {
+    "axios": "^0.26.1",
     "config": "^3.3.7",
     "consign": "^0.1.6",
     "express": "^4.17.3",

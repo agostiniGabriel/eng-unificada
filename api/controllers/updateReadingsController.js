@@ -1,9 +1,8 @@
-const { json } = require('express/lib/response');
-
 module.exports = app =>{
     const controller = {};
     const updateReadingsResponses = app.data.updateReadings;
     const utils = require('../apiUtils');
+    const axios = require('axios');
 
     const requiredBodyTemplate = {
         payload: {
@@ -15,7 +14,33 @@ module.exports = app =>{
 
     controller.updateReadings = (req,res) => {
         const { body } = req;
-        utils.validateBody(body,requiredBodyTemplate) ? res.status(200).json(updateReadingsResponses["201"]) : res.status(400).json(updateReadingsResponses["400"]);
+        if(utils.validateBody(body,requiredBodyTemplate)){
+            const now = new Date();
+
+            const formattedBody = {
+                data: {
+                    updateDate: now.toLocaleString('pt-BR'),
+                    sensorReading: body.payload
+                }
+            }
+        
+            axios
+                .post(
+                    process.env.BACKEND_DADOS, 
+                    formattedBody
+                )
+                .then((response)=>{  
+                    const { status , data } = response;
+                    status === 200 ?  res.status(201).json(updateReadingsResponses["201"]) : res.status(status).json(data);
+                })
+                .catch((error) => {
+                    const { status , data} = error.response;
+                    res.status(status).json(data)
+                });
+
+        } else {
+           res.status(400).json(updateReadingsResponses["400"]);
+        }
     }
 
     return controller;

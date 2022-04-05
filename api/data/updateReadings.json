@@ -8,5 +8,10 @@
         "sucess":true,
         "statusCode": 201,
         "detailedMessage": "Dados inseridos com sucesso."
+    },
+    "500":{
+        "sucess":false,
+        "statusCode":500,
+        "detailedMessage": "Internal Server Error"
     }
 }
