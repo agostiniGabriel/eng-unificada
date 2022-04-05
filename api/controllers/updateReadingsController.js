@@ -19,7 +19,7 @@ module.exports = app =>{
 
             const formattedBody = {
                 data: {
-                    updateDate: now.toLocaleString('pt-BR'),
+                    updateDate: now.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
                     sensorReading: body.payload
                 }
             }
