@@ -8,7 +8,10 @@ module.exports = app =>{
     const axios = require('axios');
 
     controller.getAvaliableActions = (req,res) => {
-        res.status(200).json(avaliableActions.actions);
+        const responseData = {
+            avaliableActions: [...avaliableActions.actions]
+        }
+        res.status(200).json(responseData);
     }
 
     controller.executeActions =  (req,res) => {
