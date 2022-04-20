@@ -1,0 +1,34 @@
+{
+    "actions": [
+        {
+            "actionId":"desligarMotor",
+            "description":"Invoca a função que desliga o motor da composteira"
+        },
+        {
+            "actionId":"ligarMotor",
+            "description":"Invoca a função que liga o motor da composteira"
+        },
+        {
+            "actionId":"desligarTorneira",
+            "description":"Invoca a função que desliga a torneira responsável pela umidificação"
+        },
+        {
+            "actionId":"ligarTorneira",
+            "description":"Invoca a função que liga a torneira responsável pela umidificação"
+        },
+        {
+            "actionId":"iniciarProcessamento",
+            "description":"Invoca a função que liga a composteira"
+        },
+        {
+            "actionId":"desligarProcessamento",
+            "description":"Invoca a função que desliga a composteira"
+        }
+    ],
+    "actionsResquestBodyTemplate":{
+        "data": {
+            "actionsList": []
+        }
+    }
+
+}

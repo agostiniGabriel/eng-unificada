@@ -5,7 +5,7 @@ function randomizeResponse(mockData){
 }
 
 function validateBody(body,bodyTemplate){
-    return Object.keys(body).every( property => bodyTemplate.hasOwnProperty(property));
+    return body && Object.keys(bodyTemplate).every( property => body.hasOwnProperty(property));
 }
 
 const utilsPackage = {

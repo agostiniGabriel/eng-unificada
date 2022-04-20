@@ -1,0 +1,25 @@
+{
+    "executeAction": {
+        "isSucess": "OK",
+        "message": "Subrotina acionada com sucesso!"
+    },
+    "systemStatus":
+    {
+        "data": {
+            "minUmid": 45,
+            "maxUmid": 55,
+            "minTemp": 60,
+            "maxTemp": 65,
+            "isProcessing": false
+        }
+    },
+    "sensorData":
+    {
+        "data": {
+            "temp": 23.79999924,
+            "humidity": 65,
+            "pH": 0.051269531
+        }
+    } 
+
+}

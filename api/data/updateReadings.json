@@ -13,5 +13,15 @@
         "sucess":false,
         "statusCode":500,
         "detailedMessage": "Internal Server Error"
+    },
+    "200":{
+        "sucess":true,
+        "statusCode": 200,
+        "detailedMessage": "Ações executadas com sucesso."
+    },
+    "422":{
+        "sucess":false,
+        "statusCode": 422,
+        "detailedMessage": "Existem ações inválidas. Consulte as ações disponíveis"
     }
 }
