@@ -126,7 +126,6 @@ void setup()
   restServerRouting();
   httpRestServer.begin();
 
-  //pinMode (buzzer, OUTPUT);
 }
 
 void establishConn() {
@@ -142,17 +141,119 @@ void establishConn() {
 }
 
 //Controller das rotas
-void getHelloWord() {
-    httpRestServer.send(200, "text/json", "{\"name\": \"Hello world\"}");
+void getSensorData() {
+  Serial.println("Recuperando leitura dos sensores");
+  float currentTemperature = getTemperature();
+  float currentHumidity = getHumidity();
+  float currentPH = getPh();
+  
+  DynamicJsonDocument doc(1024);
+  JsonObject payload  = doc.createNestedObject("data");
+  payload["temp"] = currentTemperature;
+  payload["humidity"] = currentHumidity;
+  payload["pH"] = currentPH;
+  char returnString[1024];
+
+  serializeJson(doc, returnString);
+
+  Serial.println("Retornando leitura dos sensores");
+  httpRestServer.send(200, F("application/json"), returnString);
+}
+
+void getSystemStatus() {
+  Serial.println("Recuperando Status do Sistema");
+  DynamicJsonDocument doc(1024);
+  JsonObject payload  = doc.createNestedObject("data");
+  payload["minUmid"] = minUmid;
+  payload["maxUmid"] = maxUmid;
+  payload["minTemp"] = minTemp;
+  payload["maxTemp"] = maxTemp;
+  if(isProcessing){
+    payload["isProcessing"] = true;
+  } else {
+    payload["isProcessing"] = false;
+  }
+
+  char returnString[1024];
+
+  serializeJson(doc, returnString);
+
+  Serial.println("Enviando status do Sistema");
+  httpRestServer.send(200, F("application/json"), returnString);
+}
+
+void postRemoteActions() {
+    String postBody = httpRestServer.arg("plain");
+    Serial.println("Recebido ==> \n" + postBody + "\n");
+ 
+    DynamicJsonDocument doc(512);
+    DeserializationError error = deserializeJson(doc, postBody);
+    if (error) {
+        Serial.print(F("Error parsing JSON "));
+        Serial.println(error.c_str());
+ 
+        String msg = error.c_str();
+ 
+        httpRestServer.send(400, F("text/html"),"Error ao dar parse no json recebido! <br>" + msg);
+ 
+    } else {
+        JsonObject postObj = doc.as<JsonObject>();
+ 
+        if (httpRestServer.method() == HTTP_POST) {
+            if (postObj.containsKey("subFunction")) {
+ 
+                String subRotina = postObj["subFunction"];
+
+                if(subRotina == "ligarMotor"){
+                  ligarMotor();
+                } else if (subRotina == "desligarMotor"){
+                  desligarMotor();
+                } else if (subRotina == "desligarTorneira"){
+                  desligarTorneira();
+                } else if (subRotina == "ligarTorneira") {
+                  ligarTorneira();
+                } else if (subRotina == "iniciarProcessamento"){
+                  iniciarProcessamento();
+                } else if (subRotina == "desligarProcessamento"){
+                  desligarProcessamento();
+                } else {
+                  DynamicJsonDocument doc(512);
+                  doc["isSucess"] = false;
+                  doc["message"]= "Subrotina inválida!";
+  
+                  String buf;
+                  serializeJson(doc, buf);
+  
+                  httpRestServer.send(422, F("application/json"), buf);
+                }
+                
+                DynamicJsonDocument doc(512);
+                doc["isSucess"] = true;
+                doc["message"]= "Subrotina acionada com sucesso!";
+ 
+                String buf;
+                serializeJson(doc, buf);
+ 
+                httpRestServer.send(201, F("application/json"), buf);
+            }else {
+                DynamicJsonDocument doc(512);
+                doc["isSucess"] = false;
+                doc["message"] = "Body Inválido";
+ 
+                String buf;
+                serializeJson(doc, buf);
+ 
+                httpRestServer.send(404, F("application/json"), buf);
+            }
+        }
+    }
 }
 
 //Rotas da API
 void restServerRouting() {
-    httpRestServer.on("/", HTTP_GET, []() {
-        httpRestServer.send(200, F("text/html"),
-            F("Welcome to the REST Web Server"));
-    });
-    httpRestServer.on(F("/helloWorld"), HTTP_GET, getHelloWord);
+    httpRestServer.on(F("/sensorData"), HTTP_GET, getSensorData);
+    httpRestServer.on(F("/systemStatus"), HTTP_GET, getSystemStatus);
+    httpRestServer.on(F("/remoteActions"), HTTP_POST, postRemoteActions);
 }
 
 void loop()
@@ -164,7 +265,7 @@ void loop()
   httpRestServer.handleClient();
 
 
-  // Variavel que seta se a composteira esta ligada ou nao. Acionada via Blynk.
+  // Variavel que seta se a composteira esta ligada ou nao. Acionada via Blynk ou Acao remota
   if (isProcessing)
   {
     time_t now = DateTime.now();
@@ -243,14 +344,6 @@ void loop()
     if (elapsed -  processingEndTime * 3600 > 0) {
       isProcessing = false;
 
-      //    for (int k = 0; k < 10; k++) {                                       // BUZZER NO FIM DO PROCESSO DAS 72 HORAS
-      //    tone (buzzer, 1000); //1000 Hz
-      //    delay (2000);
-      //    noTone (buzzer);
-      //    delay (500);
-      //    }
-      //
-      //    isProcessing = false;
       Serial.println("Fim de processamento. Desligando subrotinas...");
       desligarMotor();
       desligarTorneira();
@@ -385,6 +478,16 @@ void desligarAquecedor()                                                  // DES
   digitalWrite(D2, LOW);                                                  // COLOCAR O PINO CORRETO
   delay(10);
   Serial.println((String) "desligando o aquecedor");
+}
+
+void iniciarProcessamento(){
+  isProcessing = 1;
+  Serial.println((String) "Iniciando processamento por ação remota");  
+}
+
+void desligarProcessamento(){
+  isProcessing = 0;
+  Serial.println((String) "Finalizando processamento por ação remota");  
 }
 
 
